@@ -19,7 +19,6 @@ def read_data(fpath):
 
 def main(fpath, steps):
     template, data = read_data(fpath)
-    print(template, data)
     insertions = {dat[0]: dat[1] for dat in data}
     insertion_counter = collections.Counter()
     char_counter = collections.Counter(template)
@@ -34,13 +33,13 @@ def main(fpath, steps):
             rr = i + tt
             if ll in insertions:
                 insertion_counter[ll] += 1
-            if rr  in insertions:
+            if rr in insertions:
                 insertion_counter[rr] += 1
         previous = tt
 
     # Use the number of occurences of each insertion in one iteration to
     # compute the insertions for the next iteration
-    for _ in range(steps-1):
+    for _ in range(steps - 1):
         next_counter = collections.Counter()
         for k, v in insertion_counter.items():
             ii = insertions[k]
@@ -62,4 +61,3 @@ if __name__ == "__main__":
     print("Answer 1: ", answer_1)
     answer_2 = main(fpath, 40)
     print("Answer 2: ", answer_2)
-
