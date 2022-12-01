@@ -29,3 +29,16 @@ class Array:
             (min(i + 1, self.x - 1), j),
         ]
         return [ll for ll in loc if ll != (i, j)]
+
+    def neighbourhood(self, i, j):
+        loc = {
+            (i, min(j + 1, self.y - 1)),
+            (i, max(0, j - 1)),
+            (max(0, i - 1), max(0, j - 1)),
+            (max(0, i - 1), j),
+            (max(0, i - 1), min(j + 1, self.y - 1)),
+            (min(i + 1, self.x - 1), max(0, j - 1)),
+            (min(i + 1, self.x - 1), j),
+            (min(i + 1, self.x - 1), min(j + 1, self.y - 1)),
+        }
+        return [ll for ll in loc if ll != (i, j)]
