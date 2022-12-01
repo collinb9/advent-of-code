@@ -1,5 +1,4 @@
 import sys
-import itertools
 
 
 def read_data(fpath):
@@ -16,7 +15,6 @@ def read_data(fpath):
     return outer
 
 
-
 def main(fpath):
     data = read_data(fpath)
     sums = [sum(item) for item in data]
@@ -29,4 +27,3 @@ if __name__ == "__main__":
     answer1, answer2 = main(fpath)
     print("Answer 1: ", answer1)
     print("Answer 2: ", answer2)
-
