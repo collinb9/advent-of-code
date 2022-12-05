@@ -4,18 +4,9 @@ import copy
 
 def read_data(fpath):
     with open(fpath, "r") as fp:
-        data = [line.replace("\n", "") for line in fp.readlines()]
-    outer = []
-    inner = []
-    for dat in data:
-        if dat:
-            inner.append((dat))
-        else:
-            outer.append(inner)
-            inner = []
-    outer.append(inner)
+        _stacks, _instructions = fp.read().split("\n\n")
 
-    _stacks = outer[0]
+    _stacks = _stacks.split("\n")
     _stacks.pop()  # Remove indexes
     _stacks = [line[1::4] for line in _stacks]
 
@@ -27,7 +18,7 @@ def read_data(fpath):
             if item != " ":
                 stack.append(item)
 
-    _instructions = outer[1]
+    _instructions = _instructions.strip().split("\n")
     instructions = [
         list(map(int, instruction.split(" ")[1::2]))
         for instruction in _instructions
@@ -51,7 +42,7 @@ def main(fpath):
             stacks_1[_to - 1].append(stacks_1[_from - 1].pop())
         # Part 2
         stacks_2[_to - 1].extend(stacks_2[_from - 1][-1 * amount :])
-        stacks_2[_from - 1] = stacks_2[_from - 1][: -1 * amount]
+        del stacks_2[_from - 1][-1 * amount :]
     return get_top_crates(stacks_1), get_top_crates(stacks_2)
 
 
