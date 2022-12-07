@@ -4,7 +4,7 @@ from pathlib import Path
 
 def read_data(fpath):
     with open(fpath, "r") as fp:
-        data = fp.read().split("\n")
+        data = [line.replace("\n", "") for line in fp.readlines()]
 
     return data
 
@@ -19,15 +19,16 @@ def main(fpath):
     structure = {}
     sizes = {}
     for line in data:
-        if ls and not line.startswith("$") and not line=="":
+        if ls and not line.startswith("$"):
             if line.startswith("dir"):
-                structure.setdefault(cwd, []).append(str(Path(cwd) / line.split(" ")[-1]))
+                structure.setdefault(cwd, []).append(
+                    str(Path(cwd) / line.split(" ")[-1])
+                )
             else:
                 size = int(line.split(" ")[0])
                 _count += size
 
-
-        if ls and line.startswith("$"): # End of ls output
+        if ls and line.startswith("$"):  # End of ls output
             if cwd not in sizes:
                 sizes[cwd] = _count
             _count = 0
@@ -44,7 +45,7 @@ def main(fpath):
 
         if line.startswith("$ ls"):
             ls = True
-    #Handle last line
+    # Handle last line
     sizes[cwd] = _count
 
     ### DFS to calculate the recursive size of each directory
@@ -55,7 +56,9 @@ def main(fpath):
         current_dir = to_visit[-1]
         subdirs = structure.get(current_dir, [])
         if len(subdirs) == 0 or current_dir in visited:
-            total_sizes[current_dir] = sizes[current_dir] + sum([total_sizes[_dir] for _dir in structure.get(current_dir, [])])
+            total_sizes[current_dir] = sizes[current_dir] + sum(
+                [total_sizes[_dir] for _dir in structure.get(current_dir, [])]
+            )
             to_visit.pop()
         else:
             for _dir in subdirs:
