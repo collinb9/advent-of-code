@@ -21,6 +21,10 @@ class Array:
     def find_value(self, coord: List[int]):
         return self.loc(coord[0], coord[1])
 
+    @classmethod
+    def shift(cls, coord, shift):
+        return (coord[0] + shift[0], coord[1] + shift[1])
+
     def find_adjacent(self, i, j):
         loc = [
             (i, min(j + 1, self.y - 1)),
