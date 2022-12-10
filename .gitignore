@@ -3,4 +3,5 @@ data/
 __pycache__/
 .env
 .python-version
+bin/
 
