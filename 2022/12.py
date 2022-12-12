@@ -1,6 +1,9 @@
 import sys
-from typing import List
+import os
 import queue
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from lib.datastructures import Array
 
 
 def read_data(fpath):
@@ -9,14 +12,6 @@ def read_data(fpath):
 
     return data
 
-def adjacent(i, j, x, y):
-    loc = [
-        (i, min(j + 1, y - 1)),
-        (i, max(0, j - 1)),
-        (max(0, i - 1), j),
-        (min(i + 1, x - 1), j),
-    ]
-    return [ll for ll in loc if ll != (i, j)]
 
 def elevation(current_char):
 
@@ -26,75 +21,97 @@ def elevation(current_char):
         return ord("z")
     return ord(current_char)
 
+
 def search(data, start, _distances: dict):
     """
     Dijkstra
     """
-    xx, yy = len(data[0]), len(data)
-
-    sentinel = xx * yy
-    distances = [[sentinel for _ in range(xx)] for _ in range(yy)]
+    sentinel = data.x * data.y
+    distances = [[sentinel for _ in range(data.x)] for _ in range(data.y)]
     distances[start[1]][start[0]] = 0
     priority_queue = queue.PriorityQueue()
     priority_queue.put((0, start))
+    came_from = {start: None}
     seen = set()
     while not priority_queue.empty():
         current_distance, current = priority_queue.get()
-        print(current)
-        if data[current[1]][current[0]] == "E":
+        if data.find_value(current) == "E":
             end = current
-            print("Found end", end)
             break
-        _adjacent = set(adjacent(current[0], current[1], xx, yy))
-        already_seen = _distances.keys() & _adjacent
-        if already_seen == _adjacent:
-            min_distance = min([_distances[node] for node in already_seen])
-            _distances[current] = min_distance + 1
-            return current_distance + min_distance
+        _adjacent = set(data.find_adjacent(current[0], current[1]))
+        seen = seen.union(_distances.keys() & _adjacent)
 
-        else:
-            for (ii, jj) in _adjacent - _distances.keys():
-                if elevation(data[jj][ii]) - elevation(data[current[1]][current[0]]) <= 1:
-                    # if (ii, jj) not in seen:
-                    d = current_distance + 1
-                    if d < distances[jj][ii]:
-                        # print("Inserting distance", d , "for", (ii, jj), "=", data[jj][ii], "neighbour of", current, "=", data[current[1]][current[0]])
-                        distances[jj][ii] = d
+        for (ii, jj) in _adjacent:
+            if (
+                elevation(data.loc(ii, jj))
+                - elevation(data.find_value(current))
+                <= 1
+            ):
+                d = current_distance + 1
+                if d < distances[jj][ii]:
+                    distances[jj][ii] = d
+                    if (
+                        ii,
+                        jj,
+                    ) not in _distances:  # Only search nodes that don't have a full path associated with them
                         priority_queue.put((distances[jj][ii], (ii, jj)))
-        seen.add(current)
-    total_distance = distances[end[1]][end[0]]
-    # print(distances)
-    for node in seen:
-        _distances[node] = min(_distances.get(node, sentinel), total_distance - distances[node[1]][node[0]])
-    return  total_distance
+                        came_from[(ii, jj)] = current
+    try:
+        total_distance = distances[end[1]][end[0]]
+    except UnboundLocalError:  # Failed to reach end
+        try:
+            min_distance = min(
+                {
+                    k: v + distances[k[1]][k[0]]
+                    for k, v in _distances.items()
+                    if k in seen
+                }.items(),
+                key=lambda x: x[1],
+            )
+        except ValueError:  # Never reached a node which was part of a successful search
+            _distances[start] = sentinel
+            return sentinel
+        _distances[start] = min_distance[1]
+        return min_distance[1]
+
+    # Get the path from the stating node to the end
+    path = []
+    current = end
+    while current != start:
+        prev = came_from[current]
+        path.append(prev)
+        current = prev
+    path.append(current)
+    for node in path:
+        _distances[node] = min(
+            _distances.get(node, sentinel),
+            total_distance - distances[node[1]][node[0]],
+        )
+    return total_distance
 
 
 def main(fpath):
     data = read_data(fpath)
-    xx, yy = len(data[0]), len(data)
+    data = Array(data)
     _distances = dict()
-    # Find start
-    for ii in range(xx):
-        for jj in range(yy):
-            if data[jj][ii] == "S":
-                # data[jj][ii] = "a"
-                start = (ii, jj)
-                break
-    ans1  = search(data, start, _distances)
 
+    # Find start and 'a' entries
     to_visit = set()
-    for ii in range(xx):
-        for jj in range(yy):
-            if data[jj][ii] == "a":
-                # data[jj][ii] = "a"
-                to_visit.add((ii, jj))
-    min_distance = None
+    for jj, ii in data.grid:
+        if data.loc(ii, jj) == "S":
+            start = (ii, jj)
+        if data.loc(ii, jj) == "a":
+            to_visit.add((ii, jj))
+
+    ### Part 1
+    ans1 = search(data, start, _distances)
+
+    ### Part 2
     for node in to_visit:
         if node not in _distances:
-            _  = search(data, start, _distances)
-        # print(_distances)
-    min_distance = min([v for k, v in _distances.items() if data[k[1]][k[0]] in set(["a", "S"])] + [ans1])
-    return  ans1, min_distance
+            search(data, node, _distances)
+    min_distance = min([_distances[k] for k in to_visit] + [ans1])
+    return ans1, min_distance
 
 
 if __name__ == "__main__":

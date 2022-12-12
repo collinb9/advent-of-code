@@ -48,10 +48,10 @@ class Array:
         return [ll for ll in loc if ll != (i, j)]
 
     def find_row(self, i, j):
-        return [(k, j) for k in range(data.x)]
+        return [(k, j) for k in range(self.x)]
 
     def find_column(self, i, j):
-        return [(i, k) for k in range(data.y)]
+        return [(i, k) for k in range(self.y)]
 
     def find_all_left(self, i, j):
         return [(i - k, j) for k in range(1, i + 1)][::-1]
