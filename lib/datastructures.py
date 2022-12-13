@@ -13,7 +13,7 @@ class Array:
     def __post_init__(self):
         self.x = len(self.data[0])
         self.y = len(self.data)
-        self.grid = itertools.product(range(self.y), range(self.x))
+        self.grid = itertools.product(range(self.x), range(self.y))
 
     def loc(self, i, j):
         return self.data[j][i]
