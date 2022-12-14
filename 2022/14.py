@@ -25,7 +25,11 @@ def simulate(rocks: set, floor: int):
     sand = (500, 0)
     sands = 0
     void = True
+    # Big speed improvement: Once one grain of sand settles, can start the
+    # simulation from one place before that grain landed
+    path = [sand]
     while True:
+        path.append(sand)
         if sand[1] >= floor:
             if void:
                 yield sands
@@ -40,7 +44,8 @@ def simulate(rocks: set, floor: int):
                     rocks.add(sand)
                     if sand[1] == 0:
                         break
-                    sand = (500, 0)
+                    path.pop()
+                    sand = path.pop()
                 else:
                     sand = (sand[0] + 1, sand[1] + 1)
             else:
