@@ -47,6 +47,17 @@ class Array:
         }
         return [ll for ll in loc if ll != (i, j)]
 
+    @classmethod
+    def line(cls, start, end):
+        minx = min(start[0], end[0])
+        maxx = max(start[0], end[0])
+        miny = min(start[1], end[1])
+        maxy = max(start[1], end[1])
+        if start[0] == end[0]:
+            return [(start[0], j) for j in range(miny, maxy + 1)]
+        else:
+            return [(i, start[1]) for i in range(minx, maxx + 1)]
+
     def find_row(self, i, j):
         return [(k, j) for k in range(self.x)]
 
