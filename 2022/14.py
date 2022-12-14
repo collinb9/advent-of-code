@@ -1,5 +1,6 @@
 import sys
 import os
+import copy
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from lib.datastructures import Array
@@ -7,31 +8,31 @@ from lib.datastructures import Array
 
 def read_data(fpath):
     with open(fpath, "r") as fp:
-        data = [line.replace("\n", "") for line in fp.readlines()]
-
-    data = [list(map(lambda x: tuple(map(int, x.split(","))), item.split(" -> "))) for item in data]
+        data = [
+            list(
+                map(
+                    lambda x: tuple(map(int, x.split(","))), item.split(" -> ")
+                )
+            )
+            for item in fp.read().split("\n")
+            if item
+        ]
 
     return data
 
 
-def main(fpath):
-    data = read_data(fpath)
-
-    rocks = set()
-    for path in data:
-        for i in range(len(path) - 1):
-            full_line = set(Array.line(path[i], path[i+1]))
-            rocks = rocks.union(full_line)
-
-    sentinel = max(rocks, key =  lambda x: x[1])[1]
+def simulate(rocks: set, floor: int):
     sand = (500, 0)
     sands = 0
+    void = True
     while True:
-        if sand[1] >= sentinel:
-            # break
-            rocks.add((sand[0], sentinel + 2))
-            rocks.add((sand[0] + 1, sentinel + 2))
-            rocks.add((sand[0] - 1, sentinel + 2))
+        if sand[1] >= floor:
+            if void:
+                yield sands
+                void = False
+            rocks.add((sand[0], floor + 2))
+            rocks.add((sand[0] + 1, floor + 2))
+            rocks.add((sand[0] - 1, floor + 2))
         if (sand[0], sand[1] + 1) in rocks:
             if (sand[0] - 1, sand[1] + 1) in rocks:
                 if (sand[0] + 1, sand[1] + 1) in rocks:
@@ -46,7 +47,21 @@ def main(fpath):
                 sand = (sand[0] - 1, sand[1] + 1)
         else:
             sand = (sand[0], sand[1] + 1)
-    return sands, 0
+    yield sands
+
+
+def main(fpath):
+    data = read_data(fpath)
+
+    rocks = set()
+    for path in data:
+        for i in range(len(path) - 1):
+            full_line = set(Array.line(path[i], path[i + 1]))
+            rocks = rocks.union(full_line)
+
+    floor = max(rocks, key=lambda x: x[1])[1]
+    gen = simulate(rocks, floor)
+    return next(gen), next(gen)
 
 
 if __name__ == "__main__":
