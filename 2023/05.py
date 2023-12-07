@@ -31,7 +31,7 @@ def map_seeds(seed_intervals, maps_list):
                 # Seed is mapped in this map
                 if intervals_intersect(seed_interval, [(source, source + _len - 1)]):
                     seed_intervals.remove(seed_interval)
-                    # Seeds which are not mapped in this line need to be checked against future lines in this map
+                    # Seeds which are not mapped in this line need to be checked against future lines in the same map
                     if seed_interval[0] < source:
                         stack.append((seed_interval[0], source - 1))
                     if seed_interval[1] >= source + _len:
@@ -55,6 +55,7 @@ def map_seeds(seed_intervals, maps_list):
 def main(fpath):
     data = read_data(fpath)
     seeds = list(map(int, data[0][0].split(":")[-1].split()))
+    # This is sort of stupid for part 1, but let's me use the same function for both parts
     ans1 = min(min(map_seeds(set((seed, seed) for seed in seeds), data[1:])))
     ans2 = min(
         min(
