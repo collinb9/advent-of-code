@@ -10,10 +10,18 @@ class Array:
 
     data: List
 
-    def __post_init__(self):
-        self.x = len(self.data[0])
-        self.y = len(self.data)
-        self.grid = itertools.product(range(self.x), range(self.y))
+
+    @property
+    def grid(self):
+        return itertools.product(range(self.x), range(self.y))
+
+    @property
+    def x(self):
+        return len(self.data[0])
+
+    @property
+    def y(self):
+        return len(self.data)
 
     def loc(self, i, j):
         return self.data[j][i]
@@ -58,10 +66,14 @@ class Array:
         else:
             return [(i, start[1]) for i in range(minx, maxx + 1)]
 
-    def find_row(self, i, j):
+    @property
+    def columns(self):
+        return [self.find_column(i) for i in range(self.x)]
+
+    def find_row(self, j):
         return [(k, j) for k in range(self.x)]
 
-    def find_column(self, i, j):
+    def find_column(self, i):
         return [(i, k) for k in range(self.y)]
 
     def find_all_left(self, i, j):
