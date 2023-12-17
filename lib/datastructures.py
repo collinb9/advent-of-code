@@ -10,6 +10,7 @@ class Array:
 
     data: List
 
+    up, down, left, right = (0, -1), (0, 1), (-1, 0), (1, 0)
 
     @property
     def grid(self):
@@ -22,6 +23,10 @@ class Array:
     @property
     def y(self):
         return len(self.data)
+
+    def __contains__(self, point):
+        i, j = point
+        return (0 <= i < self.x) and (0 <= j < self.y)
 
     def loc(self, i, j):
         return self.data[j][i]
@@ -87,3 +92,7 @@ class Array:
 
     def find_all_up(self, i, j):
         return [(i, j - k) for k in range(1, j + 1)][::-1]
+
+    def pprint(self):
+        for row in self.data:
+            print("".join(row))
