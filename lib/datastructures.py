@@ -95,4 +95,4 @@ class Array:
 
     def pprint(self):
         for row in self.data:
-            print("".join(row))
+            print("".join(map(str, row)))
