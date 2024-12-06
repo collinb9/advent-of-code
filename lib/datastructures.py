@@ -10,6 +10,8 @@ class Array:
 
     data: List
 
+    sentinel = "."
+
     up, down, left, right = (0, -1), (0, 1), (-1, 0), (1, 0)
 
     @property
@@ -29,6 +31,8 @@ class Array:
         return (0 <= i < self.x) and (0 <= j < self.y)
 
     def loc(self, i, j):
+        if j < 0 or j >= self.y or i < 0 or i >= self.x:
+            return self.sentinel
         return self.data[j][i]
 
     def find_value(self, coord: List[int]):
