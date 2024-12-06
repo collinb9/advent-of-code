@@ -72,18 +72,16 @@ def main(fpath):
     seen = path_find(array, start)
     ans1 = len(seen)
 
-    for ii, jj in array.grid:
+    seen.remove(start)
+
+    for (ii, jj) in seen:
         val = array.loc(ii, jj)
         if val == EMPTY:
             array.data[jj][ii] = OBSTRUCTION
             seen = path_find(array, start)
             if seen is None:
-                print("Loop found with obstruction at", (ii, jj))
                 ans2 += 1
-
             array.data[jj][ii] = EMPTY
-
-    ans1 = len(seen)
 
     return ans1, ans2
 
