@@ -1,4 +1,5 @@
 venv/
+pypyvenv/
 data/
 __pycache__/
 .env
