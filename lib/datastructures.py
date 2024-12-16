@@ -1,7 +1,13 @@
 """ Some convenience classes for working with different datastructures """
-from typing import List
+from typing import List, Any, Tuple
 import dataclasses
 import itertools
+
+
+@dataclasses.dataclass(order=True)
+class PrioritizedItem:
+    priority: Tuple[int]
+    item: Any = dataclasses.field(compare=False)
 
 
 @dataclasses.dataclass
@@ -12,7 +18,16 @@ class Array:
 
     sentinel = "."
 
-    up, down, left, right = (0, -1), (0, 1), (-1, 0), (1, 0)
+    up, down, left, right, up_right, down_right, down_left, up_left = (
+        (0, -1),
+        (0, 1),
+        (-1, 0),
+        (1, 0),
+        (1, -1),
+        (1, 1),
+        (-1, 1),
+        (-1, -1),
+    )
 
     @property
     def grid(self):
@@ -39,6 +54,15 @@ class Array:
         return self.loc(coord[0], coord[1])
 
     @classmethod
+    def from_dict(cls, data):
+        max_x = max(data)[0]
+        max_y = max(data, key=lambda x: x[1])[1]
+        _array = [["."] * (max_x + 1) for _ in range(max_y + 1)]
+        for key, value in data.items():
+            _array[key[1]][key[0]] = str(value)
+        return cls(_array)
+
+    @classmethod
     def shift(cls, coord, shift):
         return (coord[0] + shift[0], coord[1] + shift[1])
 
@@ -48,6 +72,15 @@ class Array:
             (i, max(0, j - 1)),
             (max(0, i - 1), j),
             (min(i + 1, self.x - 1), j),
+        ]
+        return [ll for ll in loc if ll != (i, j)]
+
+    def find_adjacent_with_boundary(self, i, j):
+        loc = [
+            (i, j + 1),
+            (i - 1, j),
+            (i, j - 1),
+            (i + 1, j),
         ]
         return [ll for ll in loc if ll != (i, j)]
 
@@ -61,6 +94,19 @@ class Array:
             (min(i + 1, self.x - 1), max(0, j - 1)),
             (min(i + 1, self.x - 1), j),
             (min(i + 1, self.x - 1), min(j + 1, self.y - 1)),
+        }
+        return [ll for ll in loc if ll != (i, j)]
+
+    def neighbourhood_with_boundary(self, i, j):
+        loc = {
+            (i, j + 1),
+            (i - 1, j + 1),
+            (i - 1, j),
+            (i - 1, j - 1),
+            (i, j - 1),
+            (i + 1, j - 1),
+            (i + 1, j),
+            (i + 1, j + 1),
         }
         return [ll for ll in loc if ll != (i, j)]
 

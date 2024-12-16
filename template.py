@@ -3,7 +3,7 @@ import sys
 
 def read_data(fpath):
     with open(fpath, "r") as fp:
-        data = [line.replace("\n", "") for line in fp.readlines()]
+        data = [line for line in fp.read().splitlines()]
 
     return data
 
@@ -11,7 +11,11 @@ def read_data(fpath):
 def main(fpath):
     data = read_data(fpath)
     print(data)
-    return 0, 0
+
+    ans1 = 0
+    ans2 = 0
+
+    return ans1, ans2
 
 
 if __name__ == "__main__":

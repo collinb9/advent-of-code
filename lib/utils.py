@@ -44,6 +44,7 @@ def merge_intervals(*intervals):
     result.append(merged_interval)
     return result
 
+
 def rotate_90(direction):
     # Turn right by 90 degrees
     # Consider as complex numbers (x, y) <-> x + yi
