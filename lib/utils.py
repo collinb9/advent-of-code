@@ -43,3 +43,15 @@ def merge_intervals(*intervals):
                 merged_interval = _type([start, end])
     result.append(merged_interval)
     return result
+
+def rotate_90(direction):
+    # Turn right by 90 degrees
+    # Consider as complex numbers (x, y) <-> x + yi
+    # Rotation by 90 degrees is (x + yi) * i = -y + xi
+    # i.e. (x, y) -> (-y, x)
+
+    return (direction[1] * -1, direction[0])
+
+
+def rotate_270(direction):
+    return (direction[1], direction[0] * -1)
