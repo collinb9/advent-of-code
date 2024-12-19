@@ -11,12 +11,13 @@ class PrioritizedItem:
 
 
 @dataclasses.dataclass
-class Array:
+class BaseArray:
     """A 2-d array"""
 
-    data: List
+    xx: int = 0
+    yy: int = 0
 
-    sentinel = "."
+    sentinel = "~"
 
     up, down, left, right, up_right, down_right, down_left, up_left = (
         (0, -1),
@@ -29,42 +30,25 @@ class Array:
         (-1, -1),
     )
 
-    @property
-    def grid(self):
-        return itertools.product(range(self.x), range(self.y))
+    @classmethod
+    def shift(cls, coord, shift):
+        return (coord[0] + shift[0], coord[1] + shift[1])
 
     @property
     def x(self):
-        return len(self.data[0])
+        return self.xx
 
     @property
     def y(self):
-        return len(self.data)
+        return self.yy
 
     def __contains__(self, point):
         i, j = point
         return (0 <= i < self.x) and (0 <= j < self.y)
 
-    def loc(self, i, j):
-        if j < 0 or j >= self.y or i < 0 or i >= self.x:
-            return self.sentinel
-        return self.data[j][i]
-
-    def find_value(self, coord: List[int]):
-        return self.loc(coord[0], coord[1])
-
-    @classmethod
-    def from_dict(cls, data):
-        max_x = max(data)[0]
-        max_y = max(data, key=lambda x: x[1])[1]
-        _array = [["."] * (max_x + 1) for _ in range(max_y + 1)]
-        for key, value in data.items():
-            _array[key[1]][key[0]] = str(value)
-        return cls(_array)
-
-    @classmethod
-    def shift(cls, coord, shift):
-        return (coord[0] + shift[0], coord[1] + shift[1])
+    @property
+    def grid(self):
+        return itertools.product(range(self.x), range(self.y))
 
     def find_adjacent(self, i, j):
         loc = [
@@ -109,6 +93,50 @@ class Array:
             (i + 1, j + 1),
         }
         return [ll for ll in loc if ll != (i, j)]
+
+
+@dataclasses.dataclass
+class AbstractArray(BaseArray):
+    """A 2-d array, only storing some metadata"""
+
+    data: dict = dataclasses.field(default_factory=dict)
+
+    def loc(self, i, j, empty="."):
+        if j < 0 or j > self.y or i < 0 or i > self.x:
+            return self.sentinel
+        return self.data.get((i, j), empty)
+
+
+@dataclasses.dataclass
+class Array(BaseArray):
+    """A 2-d array stored as a list of lists"""
+
+    data: List = dataclasses.field(default_factory=list)
+
+    @property
+    def x(self):
+        return len(self.data[0])
+
+    @property
+    def y(self):
+        return len(self.data)
+
+    def loc(self, i, j):
+        if j < 0 or j >= self.y or i < 0 or i >= self.x:
+            return self.sentinel
+        return self.data[j][i]
+
+    def find_value(self, coord: List[int]):
+        return self.loc(coord[0], coord[1])
+
+    @classmethod
+    def from_dict(cls, data):
+        max_x = max(data)[0]
+        max_y = max(data, key=lambda x: x[1])[1]
+        _array = [["."] * (max_x + 1) for _ in range(max_y + 1)]
+        for key, value in data.items():
+            _array[key[1]][key[0]] = str(value)
+        return cls(data=_array)
 
     @classmethod
     def line(cls, start, end):
